@@ -42,7 +42,9 @@ def test_read_programs_all_sources(reg, tmp_path):
     assert user.scope == "user" and Status.UNINSTALLER_MISSING in user.status
 
 
-def test_inferred_location_from_icon(reg, tmp_path):
+def test_inferred_location_from_icon(reg, tmp_path, monkeypatch):
+    monkeypatch.setenv("TEMP", str(tmp_path / "SomeTemp"))
+    monkeypatch.setenv("TMP", str(tmp_path / "SomeTemp"))
     exe = touch(str(tmp_path / "Tool" / "tool.exe"))
     _entry(reg, HKLM, "Tool", DisplayName="Tool Thing", DisplayIcon=f"{exe},0", UninstallString=f'"{exe}" --remove')
     p = read_programs(reg, windows_dir=str(tmp_path / "Windows"))[0]
@@ -134,3 +136,11 @@ def test_env_in_uninstall_string(tmp_path, monkeypatch):
     monkeypatch.setenv("MYPF", str(tmp_path / "PF"))
     plan = build_plan(Program("X", uninstall_string="%MYPF%" + os.sep + "App" + os.sep + "u.exe /S"))
     assert plan.executable == exe
+
+
+def test_location_in_temp_is_not_inferred(reg, tmp_path, monkeypatch):
+    monkeypatch.setenv("TEMP", str(tmp_path))
+    monkeypatch.setenv("TMP", str(tmp_path))
+    exe = touch(str(tmp_path / "Temperature Tool" / "au_.exe"))
+    _entry(reg, HKLM, "T", DisplayName="Thing", UninstallString=f'"{exe}"')
+    assert read_programs(reg, windows_dir=str(tmp_path / "Windows"))[0].install_location == ""

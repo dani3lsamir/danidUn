@@ -52,7 +52,10 @@ def _infer_location(display_icon: str, exe: str, windows_dir: str) -> str:
         low = norm(folder).casefold()
         if not folder or (windows_dir and is_within(folder, windows_dir)):
             continue
-        if any(x in low for x in ("package cache", "\\installer", "\\temp", "installshield installation information")):
+        if any(x in low for x in ("package cache", "installshield installation information")) or \
+                low.endswith("\\installer") or "\\installer\\" in low:
+            continue
+        if any(is_within(folder, t) for t in (os.environ.get("TEMP", ""), os.environ.get("TMP", "")) if t):
             continue
         if os.path.dirname(norm(folder)) == norm(folder):  # drive root
             continue

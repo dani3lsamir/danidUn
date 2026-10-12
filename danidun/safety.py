@@ -218,8 +218,9 @@ class SafetyPolicy:
             return "protect.windows"
         if low.startswith(("\\systemroot\\", "system32\\", "\\??\\c:\\windows", "%systemroot%")):
             return "protect.windows"
-        if self.folders.windows and references_dir(image, self.folders.windows):
-            return "protect.windows"
+        for windows in {self.folders.windows, os.environ.get("SystemRoot", ""), os.environ.get("windir", "")}:
+            if windows and references_dir(image, windows):
+                return "protect.windows"
         return self.text_belongs_to_other(image)
 
     @staticmethod

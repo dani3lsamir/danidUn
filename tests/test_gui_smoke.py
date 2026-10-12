@@ -11,16 +11,7 @@ from conftest import touch
 tk = pytest.importorskip("tkinter")
 
 
-@pytest.fixture
-def tk_ok():
-    try:
-        root = tk.Tk()
-        root.destroy()
-    except tk.TclError:
-        pytest.skip("no display")
-
-
-def test_gui_end_to_end(tk_ok, folders, reg, tmp_path, monkeypatch):
+def test_gui_end_to_end(folders, reg, tmp_path, monkeypatch):
     from tkinter import messagebox
 
     import danidun.runtime as rtmod
@@ -50,7 +41,11 @@ def test_gui_end_to_end(tk_ok, folders, reg, tmp_path, monkeypatch):
     runtime = rtmod.Runtime(registry=reg, sysops=FakeSysOps(), folders=folders)
     runtime.quarantine.base = Path(tmp_path, "q")
     gc.disable()  # pumping with update() instead of mainloop(): keep Tk finalizers on this thread
-    app = MainWindow(runtime, Settings(show_store_apps=False))
+    try:
+        app = MainWindow(runtime, Settings(show_store_apps=False))
+    except tk.TclError as exc:  # no display / Tcl not installed on this machine
+        gc.enable()
+        pytest.skip(f"Tk unavailable: {exc}")
 
     def until(cond, timeout=15.0):
         end = time.time() + timeout
