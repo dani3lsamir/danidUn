@@ -201,3 +201,13 @@ def test_lnk_parser_roundtrip(tmp_path):
     assert info["target"] == r"C:\Program Files\Acme\acme.exe"
     assert parse_lnk(b"garbage") == {}
 
+
+
+def test_unrelated_install_folder_needs_review(folders, reg):
+    games = os.path.join(folders.user_profile, "Games")
+    touch(os.path.join(games, "tetrisx.exe"))
+    touch(os.path.join(games, "Other Game", "other.exe"))
+    program = Program("Tetris Deluxe", install_location=games)
+    ctx = ScanContext(reg, folders, SafetyPolicy(folders))
+    lo = by_target(run_scan(AppIdentity.build(program), ctx, ScanMode.MODERATE))[games]
+    assert lo.confidence == Confidence.MEDIUM and "unrelated_folder_name" in {e.signal for e in lo.evidence}

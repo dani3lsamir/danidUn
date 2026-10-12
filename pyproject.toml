@@ -1,0 +1,10 @@
+[project]
+name = "danidun"
+version = "0.3.0"
+description = "Free, offline Windows uninstaller with evidence-based leftover removal"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

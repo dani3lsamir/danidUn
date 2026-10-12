@@ -148,6 +148,7 @@ ES = {
     "sig.target_elsewhere": "Apunta a un archivo existente fuera del programa",
     "sig.foreign_key": "Valor dentro de la configuración de otro fabricante",
     "sig.msi_registration": "Registro de Windows Installer: revísalo antes de eliminarlo",
+    "sig.unrelated_folder_name": "El nombre de la carpeta no corresponde al programa: revísala",
     # protection
     "protect.not_absolute": "ruta no válida", "protect.drive_root": "raíz de unidad",
     "protect.system_folder": "carpeta del sistema o del usuario", "protect.windows": "componente de Windows",
@@ -277,6 +278,7 @@ EN = {
     "sig.shared_publisher": "Other installed programs share this publisher", "sig.common_files": "Shared location (Common Files)",
     "sig.user_data": "Documents folder: may contain your own files", "sig.target_elsewhere": "Points to an existing file outside the program",
     "sig.foreign_key": "Value inside another vendor's settings", "sig.msi_registration": "Windows Installer registration: review before removing",
+    "sig.unrelated_folder_name": "Folder name unrelated to the program: review it",
     "protect.not_absolute": "invalid path", "protect.drive_root": "drive root",
     "protect.system_folder": "system or user folder", "protect.windows": "Windows component",
     "protect.shared_location": "shared location", "protect.other_app": "belongs to another installed program: {arg}",

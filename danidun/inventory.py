@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import ntpath
 import os
 import re
 from typing import Callable
@@ -151,7 +152,7 @@ def _program_from_values(reg, hive, view, scope, sub, key_path, vals, exists, wi
             p.status.append(Status.MSI_UNREGISTERED)
     elif not uninstall:
         p.status.append(Status.NO_UNINSTALLER)
-    elif parsed and not parsed.resolved:
+    elif parsed and not parsed.resolved and ntpath.isabs(parsed.executable):
         p.status.append(Status.UNINSTALLER_MISSING)
     if p.install_location and not p.location_inferred and not exists(p.install_location):
         p.status.append(Status.LOCATION_MISSING)

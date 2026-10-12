@@ -47,7 +47,12 @@ def scan_files(identity: AppIdentity, ctx: ScanContext, mode: ScanMode) -> list[
 
     for d in identity.install_dirs:
         if os.path.isdir(d):
-            out.append(_folder(d).add("install_dir", d))
+            lo = _folder(d).add("install_dir", d)
+            base = os.path.basename(d.rstrip("\\/"))
+            if not identity.match_name(base)[0] and not identity.is_publisher(base):
+                # e.g. a program registered "C:\Games" as its folder: make the user review it.
+                lo.add("unrelated_folder_name", base)
+            out.append(lo)
 
     roots: list[tuple[str, str]] = [
         (f.program_files, "pf"), (f.program_files_x86, "pf"), (f.program_data, "data"),

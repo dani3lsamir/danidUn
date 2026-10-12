@@ -166,3 +166,13 @@ def test_report_written(tmp_path):
     assert json.loads(json_path.read_text(encoding="utf-8"))["program"]["name"] == "Acme <script>"
     html = html_path.read_text(encoding="utf-8")
     assert "<script>" not in html and "&lt;script&gt;" in html
+
+
+def test_service_revalidated_at_removal(folders, reg, policy, tmp_path):
+    # The scan saw a normal service, but by removal time it has become a kernel driver.
+    reg.add_key(HKLM, r"SYSTEM\CurrentControlSet\Services\AcmeSvc", {"ImagePath": "C:\\a.sys", "Type": 1})
+    sysops = FakeSysOps()
+    q = Quarantine(reg, sysops, base=tmp_path / "dn")
+    session = q.remove("Acme", [Leftover(Kind.SERVICE, "AcmeSvc", Category.SERVICES)], policy)
+    assert session.items[0].status == "skipped" and session.items[0].error == "protect.driver"
+    assert sysops.calls == []

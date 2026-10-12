@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .models import Kind, Leftover
 from .paths import is_reparse_point, is_within
-from .registry import HKLM, VIEW_64, RegistryBackend, join
+from .registry import HKLM, VIEW_64, RegistryBackend, get_int, get_str, join
 from .safety import SafetyPolicy
 from .sysops import SystemOps
 from .textutil import slug
@@ -177,8 +177,7 @@ class Quarantine:
         except Exception as exc:  # noqa: BLE001 - reported to the user per item
             return ItemResult(lo, "failed", error=str(exc))
 
-    @staticmethod
-    def _protection(lo: Leftover, policy: SafetyPolicy) -> str:
+    def _protection(self, lo: Leftover, policy: SafetyPolicy) -> str:
         if lo.protected:
             return lo.protected
         if lo.kind in (Kind.FOLDER, Kind.FILE):
@@ -189,6 +188,11 @@ class Quarantine:
             return policy.registry_value_protection(lo.hive, lo.target, lo.value_name)
         if lo.kind == Kind.TASK:
             return policy.task_protection(lo.target, lo.note)
+        if lo.kind == Kind.SERVICE:
+            vals = self.registry.values(HKLM, join(SERVICES_KEY, lo.target), VIEW_64)
+            if not vals:
+                return "missing"
+            return policy.service_protection(lo.target, get_str(vals, "ImagePath"), get_int(vals, "Type"))
         return ""
 
     def _move_path(self, lo: Leftover, session: Session, n: int) -> ItemResult:

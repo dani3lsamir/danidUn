@@ -26,6 +26,7 @@ WEIGHTS = {
     "target_elsewhere": -40,        # points to an existing file outside the install folder
     "foreign_key": -20,             # value lives under another vendor's key
     "msi_registration": -15,        # Windows Installer database entry: review before removing
+    "unrelated_folder_name": -25,   # install folder whose name has nothing to do with the app
 }
 
 HIGH = 80
